@@ -1,0 +1,12 @@
+# PowerShell script to extract saved Wi-Fi profiles and passwords
+
+$networks = netsh wlan show profiles | Select-String "All User Profile" | ForEach-Object {($_ -split ": ")[1].Trim()}
+
+foreach ($network in $networks) {
+    $password = netsh wlan show profile name="$network" key=clear | Select-String "Key Content" | ForEach-Object {($_ -split ": ")[1].Trim()}
+    if ($password) {
+        Write-Host "Network: $network Password: $password"
+    } else {
+        Write-Host "Network: $network (No password)"
+    }
+}
